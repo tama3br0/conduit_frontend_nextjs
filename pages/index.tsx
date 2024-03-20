@@ -6,6 +6,7 @@ import styles from "../styles/Home.module.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { Article } from "@/types/types";
+import Pagination from "./components/Pagination/Pagination"; // Paginationをインポート
 
 type Props = {
     articles: Article[];
@@ -200,18 +201,7 @@ export default function Home({ articles, popularTags }: Props) {
 
                             <div className={styles.horizontalLine}></div>
 
-                            {/* <ul className={styles.pagination}>
-                                <li className={styles.pageItem}>
-                                    <Link href="/" className={styles.pageLink}>
-                                        1
-                                    </Link>
-                                </li>
-                                <li className={styles.pageItem}>
-                                    <Link href="/" className={styles.pageLink}>
-                                        2
-                                    </Link>
-                                </li>
-                            </ul> */}
+                            <Pagination articles={articles} />
                         </div>
                     </div>
                 </div>
