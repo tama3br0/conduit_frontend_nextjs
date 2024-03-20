@@ -104,3 +104,46 @@ export default function Home({ articles }) {
         image_blob_id: string; // 画像の Blob ID を表すプロパティ
     }
 ```
+
+-   index.tsx に戻る
+-   今回、articles は配列で返ってくるので、新しく type Props という名前で type ファイルからインポートして定義する
+
+```tsx
+import { Article } from "@/types/types";
+
+type Props = {
+    articles: Article[];
+};
+```
+
+-   articles は、Article の配列である、と定義している。
+-   ここで定義した Props を、型として Home の引数に当てはめる
+
+```tsx
+export default function Home({ articles }: Props) {
+// 省略
+```
+
+-   この後は、articles の中身を map 関数で展開していく
+
+```tsx:index.tsx
+export default function Home({ articles }: Props) {
+    return (
+            // 省略
+            <div>
+                {articles.map((article: Article)=>{
+                    return(
+                        <div key={article.id}>
+
+                        </div>
+                    )
+                })}
+            </div>
+    )
+}
+```
+
+-   まず、div タグを作る
+-   次に、map 関数を展開する
+    -   articles の中身を article という形で展開していく
+    -   article の型を Article にしておく

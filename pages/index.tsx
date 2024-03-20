@@ -5,6 +5,11 @@ import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { Article } from "@/types/types";
+
+type Props = {
+    articles: Article[];
+};
 
 export async function getStaticProps() {
     const res = await fetch("http://localhost:3000/api/articles");
@@ -20,7 +25,7 @@ export async function getStaticProps() {
     };
 }
 
-export default function Home({ articles }) {
+export default function Home({ articles }: Props) {
     return (
         <>
             <Head>
@@ -96,35 +101,75 @@ export default function Home({ articles }) {
                                             </button>
                                         </div>
                                     </div>
-                                    <Link
-                                        href="/article/how-to-build-webapps-that-scale"
-                                        className={styles.previewLink}
-                                    >
-                                        <h1>How to build webapps that scale</h1>
-                                        <p>
-                                            This is the description for the
-                                            post.
-                                        </p>
-                                        <div className={styles.tagLists}>
-                                            <span>Read more...</span>
-                                            <ul className={styles.tagList}>
-                                                <li
+
+                                    {articles.map((article: Article) => {
+                                        return (
+                                            <div
+                                                key={article.id}
+                                                className={styles.articleCard}
+                                            >
+                                                <Link
+                                                    href={`article/${article.id}`}
                                                     className={
-                                                        styles.tagOutline
+                                                        styles.previewLink
                                                     }
                                                 >
-                                                    realworld
-                                                </li>
-                                                <li
-                                                    className={
-                                                        styles.tagOutline
-                                                    }
-                                                >
-                                                    implementations
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </Link>
+                                                    <h1>{article.title}</h1>
+                                                    <p>{article.description}</p>
+                                                    <div
+                                                        className={
+                                                            styles.tagLists
+                                                        }
+                                                    >
+                                                        <span>
+                                                            Read more...
+                                                        </span>
+                                                        <ul
+                                                            className={
+                                                                styles.tagList
+                                                            }
+                                                        >
+                                                            {article.tag_list.map(
+                                                                (
+                                                                    tag: string,
+                                                                    index: number
+                                                                ) => {
+                                                                    return (
+                                                                        <li
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className={
+                                                                                styles.tagOutline
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                tag
+                                                                            }
+                                                                        </li>
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </ul>
+                                                        <button
+                                                            className={
+                                                                styles.editButton
+                                                            }
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                        <button
+                                                            className={
+                                                                styles.deleteButton
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </Link>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
 
                                 <div className={styles.colMd3}>
