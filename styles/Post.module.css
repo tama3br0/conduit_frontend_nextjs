@@ -1,0 +1,50 @@
+/* Post.module.css */
+.createPage {
+    padding: 20px 0; /* Add padding to top and bottom */
+}
+
+.form {
+    width: 70%; /* Form width */
+    max-width: 600px; /* Max width for better readability */
+    margin: 0 auto; /* Center align the form */
+}
+
+.formGroup {
+    margin-bottom: 20px; /* Space between form groups */
+}
+
+.postLabel {
+    display: block; /* Each label on a new line */
+    margin-bottom: 5px; /* Space below labels */
+}
+
+.textInput,
+.textArea {
+    width: 100%; /* Text input and textarea full width */
+    padding: 8px; /* Padding for input fields */
+    font-size: 16px; /* Font size */
+}
+
+.textArea {
+    resize: vertical; /* Allow vertical resizing of textarea */
+}
+
+.small {
+    display: block; /* Separate small tag on a new line */
+    margin-top: 5px; /* Space above small tag */
+    color: #888; /* Dim color for small tag */
+}
+
+.submitBtn {
+    background-color: #5cb85c; /* Button background color */
+    color: #fff; /* Button text color */
+    border: none; /* Remove button border */
+    padding: 10px 20px; /* Button padding */
+    font-size: 16px; /* Button font size */
+    cursor: pointer; /* Change cursor on hover */
+    border-radius: 5px; /* Button border radius */
+}
+
+.submitBtn:hover {
+    background-color: #4cae4c; /* Button background color on hover */
+}

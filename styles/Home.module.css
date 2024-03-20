@@ -1,0 +1,178 @@
+/* メイン */
+
+.banner {
+    background-color: #5cb85c;
+    color: #fff;
+    padding: 8px;
+    text-align: center;
+}
+
+.container {
+    width: 100%; /* 例えば、親要素の幅いっぱいに広げる */
+    max-width: 1128px; /* 最大幅を設定 */
+    margin: 0 auto;
+    padding: 8px 0px;
+}
+
+.logoFont {
+    font-size: 56px;
+    font-weight: bold;
+}
+
+.containerPage {
+    width: 100%; /* 例えば、親要素の幅いっぱいに広げる */
+    max-width: 1128px; /* 最大幅を設定 */
+    margin: 0 auto;
+}
+
+.container p {
+    font-size: 24px;
+}
+
+.feedToggle {
+    padding-top: 24px;
+}
+
+.feedToggle ul,
+.feedToggle li {
+    display: inline-block;
+    list-style-type: none; /* リストのマーカーを削除 */
+}
+
+.navPills {
+    display: flex;
+    width: 100%; /* 例えば、親要素の幅いっぱいに広げる */
+    max-width: 1128px;
+}
+
+.navItem {
+    padding-right: 16px;
+    text-decoration: none;
+}
+
+/* ブログ */
+/* ユーザー情報 */
+.articlePreview {
+    width: 100%; /* 画面全体に幅を広げる */
+    max-width: 1128px; /* 最大幅を設定 */
+    margin: 0 auto;
+}
+
+.articleMeta {
+    display: flex;
+}
+
+.articleMeta img {
+    border-radius: 50%;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+}
+
+.author {
+    color: #3d8b3d;
+    font-size: 16px;
+}
+
+.date {
+    color: ##bbb;
+    font-size: 13px;
+}
+
+.btnLikesWrapper {
+    margin-left: auto; /* ボタンを右端に配置 */
+}
+
+/* ブログ */
+/* タイトル・本文など */
+.contentWrapper {
+    width: 100%; /* 画面全体に幅を広げる */
+    max-width: 1128px; /* 最大幅を設定 */
+    display: flex;
+    margin: 0 auto;
+}
+
+.previewLink {
+    width: 70%; /* 幅を70%に設定 */
+    max-width: 1128px; /* 最大幅を設定 */
+    margin-right: 4%; /* 右側のマージンを追加 */
+    text-decoration: none;
+}
+
+.previewLink h1 {
+    font-size: 24px;
+}
+
+.previewLink p {
+    color: #999;
+    font-size: 16px;
+}
+
+.previewLink span {
+    color: #bbb;
+    font-size: 13px;
+}
+
+.tagLists {
+    display: flex;
+    width: 100%; /* 画面全体に幅を広げる */
+    max-width: 1128px; /* 最大幅を設定 */
+}
+
+.tagList {
+    display: flex;
+    list-style-type: none; /* リストのマーカーを削除 */
+    margin-left: auto;
+}
+
+.tagOutline {
+    text-decoration: none; /* リンクの下線を削除 */
+    color: #aaa;
+    font-size: 13px;
+    margin-right: 12px;
+    border: 1px solid;
+    border-radius: 12px;
+    padding: 4px;
+}
+
+/* 横線 */
+.horizontalLine {
+    width: 100%; /* 画面全体に幅を広げる */
+    max-width: 1128px; /* 最大幅を設定 */
+    border-top: 1px solid #ccc; /* 灰色の直線 */
+    margin: 0 auto;
+    padding-bottom: 24px;
+}
+
+/* タグ */
+.colMd3 {
+    width: 30%; /* 幅を30%に設定 */
+    max-width: 1128px; /* 最大幅を設定 */
+}
+
+.sidebar {
+    background-color: #f3f3f3;
+    margin-left: 24px;
+    width: 255px;
+    padding: 12px;
+}
+
+.tagList {
+    list-style-type: none; /* リストのマーカーを削除 */
+    margin-left: auto;
+    flex-wrap: wrap; /* 要素が横幅をはみ出さずに折り返すようにする */
+}
+
+.tagPill {
+    text-decoration: none;
+    margin-right: 8px; /* タグ間の間隔を設定 */
+    color: #fff;
+    font-size: 13px;
+    border: 1px, solid, #818a91;
+    border-radius: 12px;
+    background-color: #818a91;
+    padding: 4px 8px;
+    margin-bottom: 4px;
+}

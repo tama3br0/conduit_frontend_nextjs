@@ -1,0 +1,190 @@
+* {
+    box-sizing: border-box;
+}
+
+/* リセットCSS */
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+/* HTML5要素にフォント設定を継承させる */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+    display: block;
+}
+
+/* IE 8 以前でHTML5要素のスタイルが正しく適用されるように */
+/* インラインブロックにさせる */
+abbr[title],
+dfn[title] {
+    border-bottom: 1px dotted;
+    cursor: help;
+}
+
+/* インライン要素のフォントの大きさを再設定する */
+mark {
+    background: #ff0;
+    color: #000;
+}
+
+/* ヘッダー */
+.header-container {
+    width: 100%; /* 例えば、親要素の幅いっぱいに広げる */
+    max-width: 1128px; /* 最大幅を設定 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* アイテムを垂直方向に中央揃え */
+
+    margin: 0 auto;
+    padding: 16px;
+}
+
+.header-navbar-brand {
+    color: #5cb85c;
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.header-navbar-nav {
+    display: flex;
+    list-style-type: none; /* リストのマーカーを削除 */
+}
+
+.header-nav-link {
+    text-decoration: none;
+    color: #000c;
+    font-size: 16px;
+    padding-right: 16px;
+}
+
+/* フッター */
+footer {
+    background-color: #38434f;
+}
+
+.footer-container {
+    display: flex;
+    width: 100%; /* 例えば、親要素の幅いっぱいに広げる */
+    max-width: 1128px; /* 最大幅を設定 */
+    color: #fff;
+    justify-content: center; /* アイテムを水平方向に中央揃え */
+    align-items: center; /* アイテムを垂直方向に中央揃え */
+    text-align: center;
+    margin: 0 auto;
+}
+
+.footer-attribution {
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-logo-font {
+    color: #fff;
+    font-size: 24px;
+    text-decoration: none;
+    margin-right: 80px; /* 間隔を追加 */
+}
+
+.footer-attribution {
+    font-size: 12px;
+}
+
+.footer-link {
+    color: #fff;
+    text-decoration: none;
+}
