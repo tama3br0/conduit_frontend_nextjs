@@ -243,3 +243,69 @@ export default function Home({ articles, popularTags }: Props) {
     );
 }
 ```
+
+### 5. Pagination を表示する
+
+-   components/Pagination/Pagination.tsx を作成
+
+```tsx
+import Link from "next/link";
+import { Article } from "@/types/types";
+import styles from "../../../styles/Pagination.module.css";
+
+const Pagination = ({ articles }: { articles: Article[] }) => {
+    // ページネーションのリンクを動的に生成する関数
+    const renderPaginationLinks = () => {
+        const totalPages = Math.ceil(articles.length / 10); // 10は1ページあたりの記事数
+        const paginationLinks = [];
+
+        for (let i = 1; i <= totalPages; i++) {
+            paginationLinks.push(
+                <li key={i} className={styles.pageItem}>
+                    <Link href={`/?page=${i}`} className={styles.pageLink}>
+                        {i}
+                    </Link>
+                </li>
+            );
+        }
+
+        return paginationLinks;
+    };
+
+    return <ul className={styles.pagination}>{renderPaginationLinks()}</ul>;
+};
+
+export default Pagination;
+```
+
+-   Pagination.module.css を作成
+
+```css
+/* Pagination.module.css */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.pageItem {
+    margin: 0 5px;
+}
+
+.pageLink {
+    display: inline-block;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.pageLink:hover {
+    background-color: #f0f0f0;
+}
+```

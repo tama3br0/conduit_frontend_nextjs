@@ -1,0 +1,27 @@
+/* Pagination.module.css */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.pageItem {
+    margin: 0 5px;
+}
+
+.pageLink {
+    display: inline-block;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.pageLink:hover {
+    background-color: #f0f0f0;
+}
