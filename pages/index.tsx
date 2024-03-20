@@ -9,23 +9,30 @@ import { Article } from "@/types/types";
 
 type Props = {
     articles: Article[];
+    popularTags: string[]; // Popular Tagsの型を追加
 };
 
 export async function getStaticProps() {
-    const res = await fetch("http://localhost:3000/api/articles");
-    const articles = await res.json();
+    const [articlesRes, popularTagsRes] = await Promise.all([
+        fetch("http://localhost:3000/api/articles"),
+        fetch("http://localhost:3000/api/tags/popular"), // Popular Tagsを取得するAPIエンドポイントを追加
+    ]);
 
-    // console.log(articles);
+    const [articles, popularTags] = await Promise.all([
+        articlesRes.json(),
+        popularTagsRes.json(),
+    ]);
 
     return {
         props: {
             articles,
+            popularTags: popularTags.popular_tags, // Popular Tagsをpropsに追加
         },
         revalidate: 60 * 60 * 24,
     };
 }
 
-export default function Home({ articles }: Props) {
+export default function Home({ articles, popularTags }: Props) {
     return (
         <>
             <Head>
@@ -177,54 +184,15 @@ export default function Home({ articles }: Props) {
                                         <p>Popular Tags</p>
 
                                         <div className={styles.tagList}>
-                                            <Link
-                                                href="/"
-                                                className={styles.tagPill}
-                                            >
-                                                programming
-                                            </Link>
-                                            <Link
-                                                href="/"
-                                                className={styles.tagPill}
-                                            >
-                                                javascript
-                                            </Link>
-                                            <Link
-                                                href="/"
-                                                className={styles.tagPill}
-                                            >
-                                                emberjs
-                                            </Link>
-                                            <Link
-                                                href="/"
-                                                className={styles.tagPill}
-                                            >
-                                                angularjs
-                                            </Link>
-                                            <Link
-                                                href="/"
-                                                className={styles.tagPill}
-                                            >
-                                                react
-                                            </Link>
-                                            <Link
-                                                href="/"
-                                                className={styles.tagPill}
-                                            >
-                                                mean
-                                            </Link>
-                                            <Link
-                                                href="/"
-                                                className={styles.tagPill}
-                                            >
-                                                node
-                                            </Link>
-                                            <Link
-                                                href="/"
-                                                className={styles.tagPill}
-                                            >
-                                                rails
-                                            </Link>
+                                            {popularTags.map((tag: string) => (
+                                                <Link
+                                                    key={tag}
+                                                    href="/"
+                                                    className={styles.tagPill}
+                                                >
+                                                    {tag}
+                                                </Link>
+                                            ))}
                                         </div>
                                     </div>
                                 </div>

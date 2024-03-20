@@ -147,3 +147,99 @@ export default function Home({ articles }: Props) {
 -   次に、map 関数を展開する
     -   articles の中身を article という形で展開していく
     -   article の型を Article にしておく
+
+### 4. PopularTags を取得する
+
+Rails 側の準備は、Rails の README.md に記載
+
+(1) Props に追記
+
+```tsx
+type Props = {
+    articles: Article[];
+    popularTags: string[]; // Popular Tagsの型を追加
+};
+```
+
+(2) コードの変更
+
+```tsx:変更前
+export async function getStaticProps() {
+    const res = await fetch("http://localhost:3000/api/articles");
+
+    const articles = await res.json();
+
+    // console.log(articles);
+
+    return {
+        props: {
+            articles,
+        },
+        revalidate: 60 * 60 * 24,
+    };
+}
+```
+
+```tsx:変更後
+export async function getStaticProps() {
+    const [articlesRes, popularTagsRes] = await Promise.all([
+        fetch("http://localhost:3000/api/articles"),
+        fetch("http://localhost:3000/api/tags/popular"), // Popular Tagsを取得するAPIエンドポイントを追加
+    ]);
+
+    const [articles, popularTags] = await Promise.all([
+        articlesRes.json(),
+        popularTagsRes.json(),
+    ]);
+
+    return {
+        props: {
+            articles,
+            popularTags: popularTags.popular_tags, // Popular Tagsをpropsに追加
+        },
+        revalidate: 60 * 60 * 24,
+    };
+}
+```
+
+解説
+
+-   最初の行では、fetch メソッドを使って http://localhost:3000/api/articles にリクエストを送ります。これは記事データを取得するための API エンドポイントです。
+
+-   次に、fetch メソッドを使って http://localhost:3000/api/tags/popular にリクエストを送ります。これは Popular Tags を取得するための API エンドポイントです。
+
+-   Promise.all メソッドは、与えられた Promise オブジェクトがすべて解決されるのを待ち、その後に 1 つの Promise を返します。これにより、複数の非同期処理を並列で実行し、それらの処理が完了するまで待機します。
+
+-   最初の fetch メソッドの結果は articlesRes 変数に、2 番目の fetch メソッドの結果は popularTagsRes 変数にそれぞれ格納されます。
+
+-   await Promise.all([...])は、並列で実行された Promise のすべての結果を配列として受け取ります。その結果をそれぞれの変数にデストラクチャリングして、それぞれのリクエストの結果を個別の変数に格納します。
+
+-   articlesRes.json()と popularTagsRes.json()は、それぞれのレスポンスの JSON データを取得します。これにより、API からのレスポンスを JavaScript オブジェクトに変換します。
+
+-   最終的に、articles 変数には記事のデータが、popularTags 変数には Popular Tags のデータが格納されます。これらの変数は、後でコンポーネント内で利用されます。
+
+さらに、return 内のコードを次のように変更
+
+```tsx
+export default function Home({ articles, popularTags }: Props) {
+    return (
+        <>
+            {/* 以前のコード */}
+            <div className={styles.colMd3}>
+                <div className={styles.sidebar}>
+                    <p>Popular Tags</p>
+
+                    <div className={styles.tagList}>
+                        {popularTags.map((tag: string) => (
+                            <Link key={tag} href="/" className={styles.tagPill}>
+                                {tag}
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            </div>
+            {/* 以前のコード */}
+        </>
+    );
+}
+```
