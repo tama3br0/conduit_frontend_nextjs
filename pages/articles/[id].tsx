@@ -1,13 +1,18 @@
-import { ArticleTypes } from "@/types/types";
+import { ArticleTypes, CommentTypes } from "@/types/types";
 import { useRouter } from "next/router";
 import React from "react";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import Image from "next/image";
+
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 import styles from "../../styles/Show.module.css";
 import Link from "next/link";
+import CommentForm from "../../components/Article/CommentForm";
+import CommentList from "../../components/Article/CommentList";
 
 type Props = {
     article: ArticleTypes;
+    comments: CommentTypes[]; // コメントデータを含む
 };
 
 // pages/articles/[id].tsx
@@ -30,19 +35,27 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }: { params: { id: string } }) {
-    const res = await fetch(`http://localhost:3000/api/articles/${params.id}`);
+    const articleRes = await fetch(
+        `http://localhost:3000/api/articles/${params.id}`
+    );
+    const article: ArticleTypes = await articleRes.json();
 
-    const article = await res.json();
+    // コメントデータを取得する
+    const commentsRes = await fetch(
+        `http://localhost:3000/api/articles/${params.id}/comments`
+    );
+    const comments: CommentTypes[] = await commentsRes.json();
 
     return {
         props: {
             article,
+            comments, // コメントデータを含める
         },
         revalidate: 60, // 1分ごとに設定
     };
 }
 
-const Article = ({ article }: Props) => {
+const Article = ({ article, comments }: Props) => {
     const router = useRouter();
 
     if (router.isFallback) {
@@ -148,88 +161,10 @@ const Article = ({ article }: Props) => {
                         </div>
                     </div>
                     <div className={styles.row}>
-                        <div className={styles.colXs12}>
-                            <form className={styles.commentFrom}>
-                                <div className={styles.cardBlock}>
-                                    <textarea
-                                        className={styles.formControl}
-                                        placeholder="Write a comment..."
-                                        rows={3}
-                                        defaultValue={""}
-                                    />
-                                </div>
-                                <div className={styles.cardFooter}>
-                                    <img
-                                        src="http://i.imgur.com/Qr71crq.jpg"
-                                        className={styles.commentAuthorImg}
-                                    />
-                                    <button className={styles.btnPrimary}>
-                                        Post Comment
-                                    </button>
-                                </div>
-                            </form>
-                            <div className={styles.card}>
-                                <div className={styles.cardBlock}>
-                                    <p className={styles.cardText}>
-                                        With supporting text below as a natural
-                                        lead-in to additional content.
-                                    </p>
-                                </div>
-                                <div className={styles.cardFooter}>
-                                    <Link
-                                        href="/profile/author"
-                                        className={styles.commentAuthor}
-                                    >
-                                        <img
-                                            src="http://i.imgur.com/Qr71crq.jpg"
-                                            className={styles.commentAuthorImg}
-                                        />
-                                    </Link>
-                                    &nbsp;
-                                    <Link
-                                        href="/profile/jacob-schmidt"
-                                        className={styles.commentauthor}
-                                    >
-                                        Jacob Schmidt
-                                    </Link>
-                                    <span className={styles.datePosted}>
-                                        Dec 29th
-                                    </span>
-                                </div>
-                            </div>
-                            <div className={styles.card}>
-                                <div className={styles.cardBlock}>
-                                    <p className={styles.cardText}>
-                                        With supporting text below as a natural
-                                        lead-in to additional content.
-                                    </p>
-                                </div>
-                                <div className={styles.cardFooter}>
-                                    <Link
-                                        href="/profile/author"
-                                        className={styles.commentAuthor}
-                                    >
-                                        <img
-                                            src="http://i.imgur.com/Qr71crq.jpg"
-                                            className={styles.commentAuthorImg}
-                                        />
-                                    </Link>
-                                    &nbsp;
-                                    <Link
-                                        href="/profile/jacob-schmidt"
-                                        className={styles.commentAuthor}
-                                    >
-                                        Jacob Schmidt
-                                    </Link>
-                                    <span className={styles.datePosted}>
-                                        Dec 29th
-                                    </span>
-                                    <span className={styles.modOptions}>
-                                        <i className={styles.ionTrash} />
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                        {/* コメントフォーム */}
+                        <CommentForm articleId={parseInt(article.id)} />
+                        {/* コメントリスト */}
+                        <CommentList comments={comments} />
                     </div>
                 </div>
             </div>

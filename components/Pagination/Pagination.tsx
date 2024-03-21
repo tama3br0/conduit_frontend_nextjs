@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Article } from "@/types/types";
-import styles from "../../../styles/Pagination.module.css";
+import { ArticleTypes } from "@/types/types";
+import styles from "../../styles/Pagination.module.css";
 
-const Pagination = ({ articles }: { articles: Article[] }) => {
+const Pagination = ({ articles }: { articles: ArticleTypes[] }) => {
     // ページネーションのリンクを動的に生成する関数
     const renderPaginationLinks = () => {
         const totalPages = Math.ceil(articles.length / 10); // 10は1ページあたりの記事数

@@ -251,7 +251,7 @@ export default function Home({ articles, popularTags }: Props) {
 ```tsx
 import Link from "next/link";
 import { ArticleTypes } from "@/types/types";
-import styles from "../../../styles/Pagination.module.css";
+import styles from "../../styles/Pagination.module.css";
 
 const Pagination = ({ articles }: { articles: ArticleTypes[] }) => {
     // ページネーションのリンクを動的に生成する関数
@@ -618,4 +618,262 @@ const Article = ({ article }: Props) => {
 };
 
 export default Article;
+```
+
+### 7. 詳細ページからコメントを入力・閲覧できるようにする
+
+(1) services ディレクトリを作成し、その中に commentService.ts を作成
+
+```ts
+import { CommentTypes } from "../types/types";
+
+// コメントを投稿するためのサービス
+export const submitComment = async (comment: CommentTypes): Promise<void> => {
+    const response = await fetch(
+        `http://localhost:3000/api/articles/${comment.article_id}/comments`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(comment),
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to submit comment");
+    }
+};
+
+// コメントを削除するためのサービス
+export const deleteComment = async (
+    articleId: string,
+    commentId: string
+): Promise<void> => {
+    const response = await fetch(
+        `http://localhost:3000/api/articles/${articleId}/comments/${commentId}`,
+        {
+            method: "DELETE",
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to delete comment");
+    }
+};
+```
+
+(2) types ディレクトリの types ファイル内に、CommentTypes を型定義
+
+```ts
+export interface ArticleTypes {
+    id: string;
+    title: string;
+    description: string;
+    body: string;
+    created_at: string;
+    updated_at: string;
+    tag_list: string[];
+    image_blob_id: string;
+}
+
+// 追記
+export interface CommentTypes {
+    id: number;
+    content: string;
+    author_name: string;
+    article_id: number;
+    created_at: string;
+    updated_at: string;
+}
+```
+
+(3) components ディレクトリ内に Article ディレクトリを作成し、そこに CommentForm.tsx と CommentList.tsx を作成
+
+```tsx:CommentFrom.tsx
+import React, { useState } from "react";
+import { submitComment } from "../../services/commentService";
+import styles from "../../styles/Comment.module.css";
+
+type Props = {
+    articleId: number;
+};
+
+const CommentForm: React.FC<Props> = ({ articleId }) => {
+    const [content, setContent] = useState("");
+    const [authorName, setAuthorName] = useState("");
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await submitComment({
+                content,
+                author_name: authorName,
+                article_id: articleId,
+                id: 0,
+                created_at: "",
+                updated_at: "",
+            });
+            // コメント投稿後の処理を追加する場合はここに記述
+            console.log("Comment submitted successfully!");
+            // コメントフォームをクリア
+            setContent("");
+            setAuthorName("");
+
+            // コメント投稿後に画面を更新する
+            window.location.reload();
+        } catch (error) {
+            console.error("Error submitting comment:", error);
+        }
+    };
+
+    return (
+        <form className={styles.form} onSubmit={handleSubmit}>
+            <div className={styles.inputGroup}>
+                <input
+                    className={styles.input}
+                    type="text"
+                    placeholder="貴様の名前を入力するのだッ！"
+                    value={authorName}
+                    onChange={(e) => setAuthorName(e.target.value)}
+                />
+            </div>
+            <div className={styles.inputGroup}>
+                <textarea
+                    className={styles.textarea}
+                    placeholder="好きにしゃべるがいいッ！"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                />
+            </div>
+            <div className={styles.inputGroup}>
+                <button className={styles.button} type="submit">
+                    コメントを投稿するッ！
+                </button>
+            </div>
+        </form>
+    );
+};
+
+export default CommentForm;
+
+```
+
+```tsx:CommentList.tsx
+import React from "react";
+import { CommentTypes } from "../../types/types";
+import styles from "../../styles/Comment.module.css";
+import { deleteComment } from "../../services/commentService";
+
+type Props = {
+    comments: CommentTypes[];
+};
+
+const CommentList: React.FC<Props> = ({ comments }) => {
+    const handleDelete = async (articleId: string, id: string) => {
+        // 確認ダイアログを表示し、ユーザーが削除を確認した場合のみ削除を実行します
+        const confirmDelete = window.confirm("なん…だと…ッ");
+        if (!confirmDelete) {
+            return; // ユーザーがキャンセルした場合は処理を中止します
+        }
+
+        try {
+            await deleteComment(articleId, id);
+            // コメントを削除した後、画面を更新するなどの処理を実行します。
+            // 以下は画面の更新の例ですが、実際のアプリケーションに合わせて適切な処理を行ってください。
+
+            // 画面を再読み込みする
+            window.location.reload();
+
+            // または、コメントを再取得して画面を更新するなど、アプリケーションの仕様に応じた処理を実行する
+            // 例: fetchComments(); // コメントを再取得する関数を呼び出す（仮定）
+        } catch (error) {
+            console.error("削除エラー:", error);
+        }
+    };
+
+    return (
+        <div className={styles.commentsContainer}>
+            <h3 className={styles.heading}>Comments</h3>
+            {comments.map((comment) => (
+                <div key={comment.id} className={styles.comment}>
+                    <p className={styles.content}>{comment.content}</p>
+                    <p className={styles.author}>By: {comment.author_name}</p>
+                    <button
+                        onClick={
+                            () => handleDelete(comment.article_id, comment.id) // idをstring型のまま渡す
+                        }
+                        className={styles.deleteButton}
+                    >
+                        削除
+                    </button>
+                    <div className={styles.horizontalLine}></div>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+export default CommentList;
+
+```
+
+(4) [id].tsx ファイルを書き換える
+
+```tsx
+import React from "react";
+import { CommentTypes } from "../../types/types";
+import styles from "../../styles/Comment.module.css";
+import { deleteComment } from "../../services/commentService";
+
+type Props = {
+    comments: CommentTypes[];
+};
+
+const CommentList: React.FC<Props> = ({ comments }) => {
+    const handleDelete = async (articleId: string, id: string) => {
+        // 確認ダイアログを表示し、ユーザーが削除を確認した場合のみ削除を実行します
+        const confirmDelete = window.confirm("なん…だと…ッ");
+        if (!confirmDelete) {
+            return; // ユーザーがキャンセルした場合は処理を中止します
+        }
+
+        try {
+            await deleteComment(articleId, id);
+            // コメントを削除した後、画面を更新するなどの処理を実行します。
+            // 以下は画面の更新の例ですが、実際のアプリケーションに合わせて適切な処理を行ってください。
+
+            // 画面を再読み込みする
+            window.location.reload();
+
+            // または、コメントを再取得して画面を更新するなど、アプリケーションの仕様に応じた処理を実行する
+            // 例: fetchComments(); // コメントを再取得する関数を呼び出す（仮定）
+        } catch (error) {
+            console.error("削除エラー:", error);
+        }
+    };
+
+    return (
+        <div className={styles.commentsContainer}>
+            <h3 className={styles.heading}>Comments</h3>
+            {comments.map((comment) => (
+                <div key={comment.id} className={styles.comment}>
+                    <p className={styles.content}>{comment.content}</p>
+                    <p className={styles.author}>By: {comment.author_name}</p>
+                    <button
+                        onClick={
+                            () => handleDelete(comment.article_id, comment.id) // idをstring型のまま渡す
+                        }
+                        className={styles.btnOutlineDelete}
+                    >
+                        削除
+                    </button>
+                    <div className={styles.horizontalLine}></div>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+export default CommentList;
 ```
