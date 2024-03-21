@@ -93,7 +93,7 @@ export default function Home({ articles }) {
 -   TypeScript なので、型を定義する必要がある - 今回は、型定義用のファイルを作る - ルートディレクトリに types フォルダを作り、その中の types.ts ファイルで定義する
 
 ```ts:types.ts
-    export interface Article {
+    export interface ArticleTypes {
         id: string;
         title: string;
         description: string;
@@ -109,10 +109,10 @@ export default function Home({ articles }) {
 -   今回、articles は配列で返ってくるので、新しく type Props という名前で type ファイルからインポートして定義する
 
 ```tsx
-import { Article } from "@/types/types";
+import { ArticleTypes } from "@/types/types";
 
 type Props = {
-    articles: Article[];
+    articles: ArticleTypes[];
 };
 ```
 
@@ -131,7 +131,7 @@ export default function Home({ articles }: Props) {
     return (
             // 省略
             <div>
-                {articles.map((article: Article)=>{
+                {articles.map((article: ArticleTypes)=>{
                     return(
                         <div key={article.id}>
 
@@ -146,7 +146,7 @@ export default function Home({ articles }: Props) {
 -   まず、div タグを作る
 -   次に、map 関数を展開する
     -   articles の中身を article という形で展開していく
-    -   article の型を Article にしておく
+    -   article の型を ArticleTypes にしておく
 
 ### 4. PopularTags を取得する
 
@@ -156,7 +156,7 @@ Rails 側の準備は、Rails の README.md に記載
 
 ```tsx
 type Props = {
-    articles: Article[];
+    articles: ArticleTypes[];
     popularTags: string[]; // Popular Tagsの型を追加
 };
 ```
@@ -250,10 +250,10 @@ export default function Home({ articles, popularTags }: Props) {
 
 ```tsx
 import Link from "next/link";
-import { Article } from "@/types/types";
+import { ArticleTypes } from "@/types/types";
 import styles from "../../../styles/Pagination.module.css";
 
-const Pagination = ({ articles }: { articles: Article[] }) => {
+const Pagination = ({ articles }: { articles: ArticleTypes[] }) => {
     // ページネーションのリンクを動的に生成する関数
     const renderPaginationLinks = () => {
         const totalPages = Math.ceil(articles.length / 10); // 10は1ページあたりの記事数
@@ -308,4 +308,314 @@ export default Pagination;
 .pageLink:hover {
     background-color: #f0f0f0;
 }
+```
+
+### 6. 詳細ページを作成する
+
+(1) 動的ルーティングを入れる
+
+-   pages ディレクトリ内に新しく articles というディレクトリを作り、Rails で設定した動的ルーティングを入れる
+    -   pages/articles/[id].tsx
+
+[]で囲むことで、id の部分が動的に変更される
+
+-   [id].tsx にコードを書く際に、「rafce」と入力して Tab 補完すると早い
+
+```tsx
+import React from "react";
+
+const Article = () => {
+    return <div>詳細ページを作成中</div>;
+};
+
+export default Article;
+```
+
+-   動的ルーティングにおける ISR を設定する際には、getStaticProps だけでなく、getStaticPaths も設定する必要がある
+
+(2) 詳細ページのエンドポイントを叩いていく
+
+```tsx:[id].tsx
+import React from "react";
+
+export async function getStaticProps() {
+    const res = await fetch(`http://localhost:3000/api/articles/${params.id}`); // バッククォーテーションで囲む
+
+    const article = await res.json();
+
+    return {
+        props: {
+            article,
+        },
+        revalidate: 60, // 1分ごとに設定
+    };
+}
+
+const Article = () => {
+    return <div>詳細ページを作成中</div>;
+};
+
+export default Article;
+```
+
+-   この時点では、まだ params を定義していないので、以下のように追記していく
+
+```tsx
+//TypeScriptなので、paramsのidのstringと型定義
+export async function getStaticProps({ params }: { params: { id: string } }) {
+    const res = await fetch(`http://localhost:3000/api/articles/${params.id}`);
+
+    const articles = await res.json();
+
+    return {
+        props: {
+            article,
+        },
+        revalidate: 60, // 1分ごとに設定
+    };
+}
+// 以下略
+```
+
+-   次に、これを受け取るためにコードに追記していく
+
+```tsx
+// 型定義したファイルを参照
+import { ArticleTypes } from "@/types/types";
+import React from "react";
+
+// Propsという型に代入
+type Props = {
+    article: ArticleTypes;
+};
+
+export async function getStaticProps({ params }: { params: { id: string } }) {
+    const res = await fetch(`http://localhost:3000/api/articles/${params.id}`);
+
+    const article = await res.json();
+
+    return {
+        props: {
+            article,
+        },
+        revalidate: 60, // 1分ごとに設定
+    };
+}
+
+// ()内に書いて渡す
+const Article = ({ article }: Props) => {
+    return <div>詳細ページを作成中</div>;
+};
+
+export default Article;
+```
+
+-   しかし、この状態で/artiles/1 にアクセスしてもエラーが起きる
+-   動的ルーティングを使用する場合は、getStaticPaths を設定しなければならない
+
+(3) getStaticPaths の設定
+
+-   エラー文にある公式ドキュメントにアクセスしてみる
+-   Error: getStaticPaths is required for dynamic SSG pages and is missing for '/articles/[id]'.
+    Read more: https://nextjs.org/docs/messages/invalid-getstaticpaths-value
+-   上記サイトの paths 内に書かれているコードをコピーして貼り付ける
+
+```tsx
+import { ArticleTypes } from "@/types/types";
+import React from "react";
+
+type Props = {
+    article: ArticleTypes;
+};
+
+//この位置に、ただ貼り付けただけ
+//pages/blog/[slug].js
+export async function getStaticPaths() {
+    return {
+        paths: [
+            // String variant:
+            "/blog/first-post",
+            // Object variant:
+            { params: { slug: "second-post" } },
+        ],
+        fallback: true,
+    };
+}
+
+export async function getStaticProps({ params }: { params: { id: string } }) {
+    const res = await fetch(`http://localhost:3000/api/articles/${params.id}`);
+
+    const article = await res.json();
+
+    return {
+        props: {
+            article,
+        },
+        revalidate: 60, // 1分ごとに設定
+    };
+}
+
+const Article = ({ article }: Props) => {
+    return <div>詳細ページを作成中</div>;
+};
+
+export default Article;
+```
+
+-   貼り付けたコードは例なので、書き換えていく必要がある。(pages/articles/[id].tsx の場合に書き換える)
+
+```tsx
+// pages/articles/[id].tsx
+export async function getStaticPaths() {
+    return {
+        paths: [
+            // Object variant:
+            { params: { id: "/articles/6" } }, //<=
+        ],
+        fallback: true,
+    };
+}
+```
+
+-   この状態だと、id が 6 のページの path を参照している状態
+-   投稿が増えるにつれて、この path も増えていく
+-   そのため、この部分も API を叩いて変えていく
+
+(4) 全てのブログ記事を取得する
+
+-   まず、全てのブログの情報を取得する
+
+```tsx
+import { ArticleTypes } from "@/types/types";
+import React from "react";
+
+type Props = {
+    article: ArticleTypes;
+};
+
+// pages/articles/[id].tsx
+export async function getStaticPaths() {
+    const res = await fetch("http://localhost:3000/api/articles");
+    const articles: ArticleTypes[] = await res.json(); // 型定義をして、ArticleTypesを配列として持っておく
+
+    return {
+        paths: [
+            // Object variant:
+            { params: { id: "/articles/6" } },
+        ],
+        fallback: true,
+    };
+}
+
+export async function getStaticProps({ params }: { params: { id: string } }) {
+    const res = await fetch(`http://localhost:3000/api/articles/${params.id}`);
+
+    const article = await res.json();
+
+    return {
+        props: {
+            article,
+        },
+        revalidate: 60, // 1分ごとに設定
+    };
+}
+
+const Article = ({ article }: Props) => {
+    return <div>詳細ページを作成中</div>;
+};
+
+export default Article;
+```
+
+#### getStaticPaths の articles には型定義が必須で、getStaticProps の articles には型定義が不要な理由
+
+getStaticPaths と getStaticProps は Next.js で使用される関数であり、それぞれ異なる目的を持っています。
+
+1. getStaticPaths:
+
+-   getStaticPaths は、動的なページのパスを生成するために使用されます。
+-   この関数は、事前にビルド時にどのパスが生成されるかを指定します。
+-   パスの生成には、データの取得が必要であり、そのためには型定義が必要です。
+-   したがって、articles の型定義が必須です。
+
+2. getStaticProps:
+
+-   getStaticProps は、動的なページのデータを取得するために使用されます。
+-   この関数は、指定されたパスに基づいてページのデータを取得し、そのデータをページコンポーネントに渡します。
+-   これは、パスごとに異なるデータを取得するためのものであり、全てのページに共通のデータ型が必要ではありません。
+-   従って、articles の型定義が必須ではありません。
+
+3. まとめ
+   つまり、getStaticPaths は動的なパスを生成するためにデータを取得し、そのデータの型を正確に把握する必要がありますが、getStaticProps は各ページのデータを取得するために使用されるため、ページごとに異なる型のデータを返す必要があるわけではありません。
+
+(5) 取得したブログデータの id を map 関数で展開する
+
+```tsx
+export async function getStaticPaths() {
+    const res = await fetch("http://localhost:3000/api/articles");
+    const articles: ArticleTypes[] = await res.json();
+
+    // 取得したデータのidを展開 toString()はrubyの.to_sと同じ
+    const paths = articles.map((article) => {
+        return {
+            params: {
+                id: article.id.toString(),
+            },
+        };
+    });
+
+    // つまり、↑のreturn内のコードが展開されていくと、↓のreturn内のようなコードとして読み込まれていく
+    return {
+        paths: [
+            // Object variant:
+            { params: { id: "/articles/6" } },
+        ],
+        fallback: true,
+    };
+}
+```
+
+-   というわけで
+
+```tsx
+// pages/articles/[id].tsx
+export async function getStaticPaths() {
+    const res = await fetch("http://localhost:3000/api/articles");
+    const articles: ArticleTypes[] = await res.json();
+
+    const paths = articles.map((article) => {
+        return {
+            params: {
+                id: article.id.toString(),
+            },
+        };
+    });
+
+    return {
+        paths, // ここに、上で定義した定数のpathsを入れてあげればOK
+        fallback: true,
+        //fallbackにはfalse,blockingもある。trueだと「ページをすぐ返す」状態なので、最初に真っ白な空のページが出て、そのあと読み込まれたデータが描画される、という感じになる。そのため、「Loading...」のような画面を表示させて、読み込み中であることをユーザーに伝える方法もある。
+    };
+}
+```
+
+(6) fallback: true により、空のページが返ってきているときにだけ「ロード中」と表示させる
+
+```tsx:[id].tsx
+import { useRouter } from "next/router";
+
+// 省略
+const Article = ({ article }: Props) => {
+    // Next.jsのuseRouterを使う
+    const router = useRouter();
+
+    // isFallbackという条件文があるので、それを使用。fallback中の時にLoadingと出す設定
+    if (router.isFallback) {
+        return <div>Loading...</div>;
+    }
+
+    return <div>詳細ページを作成中</div>;
+};
+
+export default Article;
 ```

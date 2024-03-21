@@ -1,0 +1,165 @@
+.banner {
+    background-color: #333333;
+    padding: 24px;
+}
+
+.container {
+    width: 100%; /* 例えば、親要素の幅いっぱいに広げる */
+    max-width: 1128px; /* 最大幅を設定 */
+    color: #fff;
+    text-align: center;
+    margin: 0 auto;
+}
+
+/* ブログタイトル */
+.container h1 {
+    font-size: 45px;
+    font-weight: bold;
+    padding: 16px;
+}
+
+/* ユーザー情報 */
+.articleMeta {
+    display: flex;
+    height: 30px; /* 任意の高さを指定 */
+}
+
+.articleMeta img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    height: 30px; /* .info の高さを30pxに指定 */
+    justify-content: space-between; /* 上下に均等に配置 */
+    margin-right: 16px;
+}
+
+.author {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    height: 50%;
+}
+
+.date {
+    color: #bbb;
+    font-size: 13px;
+    height: 50%;
+}
+
+/* ボタンコンテナ */
+.buttonContainer {
+    display: flex;
+    gap: 8px; /* ボタン要素間の間隔 */
+}
+
+/* ボタンの初期状態 */
+.btnOutlineSecondary {
+    color: #bbb;
+    font-size: 14px;
+    border: 2px solid #bbb;
+    background-color: transparent;
+    transition: color 0.3s, background-color 0.3s;
+    height: auto; /* 高さを自動調整 */
+}
+
+.btnOutlinePrimary {
+    color: #5cb85c;
+    font-size: 14px;
+    border: 2px solid #5cb85c;
+    background-color: transparent;
+    transition: color 0.3s, background-color 0.3s;
+}
+
+.btnOutlineEdit {
+    color: #0099ff;
+    font-size: 14px;
+    border: 2px solid #0099ff;
+    background-color: transparent;
+    transition: color 0.3s, background-color 0.3s;
+}
+
+.btnOutlineDelete {
+    color: #ff6666;
+    font-size: 14px;
+    border: 2px solid #ff6666;
+    background-color: transparent;
+    transition: color 0.3s, background-color 0.3s;
+}
+
+/* ホバー時のスタイル */
+.btnOutlineSecondary:hover {
+    color: white;
+    background-color: #bbb;
+}
+
+.btnOutlinePrimary:hover {
+    color: white;
+    background-color: #5cb85c;
+}
+
+.btnOutlineEdit:hover {
+    color: white;
+    background-color: #0099ff;
+}
+
+.btnOutlineDelete:hover {
+    color: white;
+    background-color: #ff6666;
+}
+
+/* ブログ本文 */
+.articleContent {
+    width: 100%; /* 例えば、親要素の幅いっぱいに広げる */
+    max-width: 1128px; /* 最大幅を設定 */
+    text-align: center;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+/* タグ */
+.tagList {
+    display: flex;
+    list-style-type: none; /* リストのマーカーを削除 */
+    margin-top: 24px;
+}
+
+.tagPill {
+    color: #aaa;
+    font-size: 13px;
+    margin-right: 12px;
+    border: 1px solid;
+    border-radius: 12px;
+    padding: 4px;
+}
+
+/* 横線 */
+.horizontalLine {
+    width: 100%; /* 画面全体に幅を広げる */
+    max-width: 1128px; /* 最大幅を設定 */
+    border-top: 1px solid #ccc; /* 灰色の直線 */
+    margin: 0 auto;
+    padding-bottom: 24px;
+}
+
+/* フッターのユーザー情報 */
+.articleActions {
+    display: flex; /* 要素をフレックスボックスにする */
+    justify-content: center; /* 横方向に中央寄せする */
+    align-items: center; /* 縦方向に中央寄せする */
+}
+
+.articleActions .author {
+    color: #5cb85c;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.articleActions .articleMeta {
+    text-align: center;
+}

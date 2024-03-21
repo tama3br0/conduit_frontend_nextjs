@@ -176,3 +176,32 @@
     padding: 4px 8px;
     margin-bottom: 4px;
 }
+
+/* ボタン */
+/* ボタンの初期状態 */
+.btnOutlineEdit {
+    color: #0099ff;
+    font-size: 14px;
+    border: 2px solid #0099ff;
+    background-color: transparent;
+    transition: color 0.3s, background-color 0.3s;
+}
+
+.btnOutlineDelete {
+    color: #ff6666;
+    font-size: 14px;
+    border: 2px solid #ff6666;
+    background-color: transparent;
+    transition: color 0.3s, background-color 0.3s;
+}
+
+/* ホバー時のスタイル */
+.btnOutlineEdit:hover {
+    color: white;
+    background-color: #0099ff;
+}
+
+.btnOutlineDelete:hover {
+    color: white;
+    background-color: #ff6666;
+}

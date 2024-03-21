@@ -5,11 +5,11 @@ import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { Article } from "@/types/types";
+import { ArticleTypes } from "@/types/types";
 import Pagination from "./components/Pagination/Pagination"; // Paginationをインポート
 
 type Props = {
-    articles: Article[];
+    articles: ArticleTypes[];
     popularTags: string[]; // Popular Tagsの型を追加
 };
 
@@ -110,7 +110,7 @@ export default function Home({ articles, popularTags }: Props) {
                                         </div>
                                     </div>
 
-                                    {articles.map((article: Article) => {
+                                    {articles.map((article: ArticleTypes) => {
                                         return (
                                             <div
                                                 key={article.id}
@@ -161,20 +161,23 @@ export default function Home({ articles, popularTags }: Props) {
                                                         </ul>
                                                         <button
                                                             className={
-                                                                styles.editButton
+                                                                styles.btnOutlineEdit
                                                             }
                                                         >
                                                             Edit
                                                         </button>
                                                         <button
                                                             className={
-                                                                styles.deleteButton
+                                                                styles.btnOutlineDelete
                                                             }
                                                         >
                                                             Delete
                                                         </button>
                                                     </div>
                                                 </Link>
+                                                <span>
+                                                    {article.created_at}
+                                                </span>
                                             </div>
                                         );
                                     })}
