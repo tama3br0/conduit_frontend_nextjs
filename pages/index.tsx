@@ -3,10 +3,10 @@ import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 import { ArticleTypes } from "@/types/types";
-import Pagination from "./components/Pagination/Pagination"; // Paginationをインポート
+import Pagination from "../components/Pagination/Pagination"; // Paginationをインポート
 
 type Props = {
     articles: ArticleTypes[];
