@@ -877,3 +877,977 @@ const CommentList: React.FC<Props> = ({ comments }) => {
 
 export default CommentList;
 ```
+
+### 8. 投稿ページの HTML 要素を作成する
+
+今回は、このような感じで
+
+```tsx:create_post.tsx
+import Head from "next/head";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import styles from "../styles/Post.module.css";
+
+export default function Create() {
+    return (
+        <div>
+            <Head>
+                <title>新規投稿</title>
+                <meta
+                    name="description"
+                    content="Create a new post on Conduit."
+                />
+            </Head>
+            <Header />
+            <div className={styles.createPage}>
+                <div className={styles.container}>
+                    <h1 className={styles.title}>新規投稿</h1>
+                    <form className={styles.form}>
+                        <div className={styles.formGroup}>
+                            <label htmlFor="title" className={styles.postLabel}>
+                                タイトル
+                            </label>
+                            <input
+                                type="text"
+                                id="title"
+                                className={styles.textInput}
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label
+                                htmlFor="description"
+                                className={styles.postLabel}
+                            >
+                                概要
+                            </label>
+                            <input
+                                type="text"
+                                id="description"
+                                className={styles.textInput}
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label htmlFor="body" className={styles.postLabel}>
+                                本文
+                            </label>
+                            <textarea
+                                id="body"
+                                rows={8}
+                                className={styles.textArea}
+                            ></textarea>
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label htmlFor="tags" className={styles.postLabel}>
+                                タグ設定
+                            </label>
+                            <input
+                                type="text"
+                                id="tags"
+                                className={styles.textInput}
+                            />
+                            <small className={styles.small}>
+                                タグは、コンマで区切って入力するのだッ
+                            </small>
+                        </div>
+                        <button type="submit" className={styles.submitBtn}>
+                            オラ！
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <Footer />
+        </div>
+    );
+}
+
+```
+
+### 9. 投稿ページから入力したデータが反映されるようにする
+
+-   入力された文字列を取得する
+    -   useState で状態(変数)を管理する。今回は、文字列を格納するためのフックス。
+        -   バリデーションをかけたい場合は、useForm という React フックフォームがあるよ。
+    -   onChange のプロパティで、入力されたら発火するプロパティを設定する
+    -   変数を API と一緒に叩く
+
+このような流れで設定する
+
+(1) useState の準備
+
+```tsx
+import Head from "next/head";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import styles from "../styles/Post.module.css";
+import { useState } from "react";
+
+export default function Create() {
+    // useStateの追加
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [body, setBody] = useState("");
+    const [tagList, setTagList] = useState("");
+    return (
+        <div>
+            <Head>
+                <title>新規投稿</title>
+                <meta
+                    name="description"
+                    content="Create a new post on Conduit."
+                />
+            </Head>
+            <Header />
+            <div className={styles.createPage}>
+                <div className={styles.container}>
+                    <h1 className={styles.title}>新規投稿</h1>
+                    <form className={styles.form}>
+                        <div className={styles.formGroup}>
+                            <label htmlFor="title" className={styles.postLabel}>
+                                タイトル
+                            </label>
+                            <input
+                                type="text"
+                                id="title"
+                                className={styles.textInput}
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label
+                                htmlFor="description"
+                                className={styles.postLabel}
+                            >
+                                概要
+                            </label>
+                            <input
+                                type="text"
+                                id="description"
+                                className={styles.textInput}
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label htmlFor="body" className={styles.postLabel}>
+                                本文
+                            </label>
+                            <textarea
+                                id="body"
+                                rows={8}
+                                className={styles.textArea}
+                            ></textarea>
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label htmlFor="tags" className={styles.postLabel}>
+                                タグ設定
+                            </label>
+                            <input
+                                type="text"
+                                id="tags"
+                                className={styles.textInput}
+                            />
+                            <small className={styles.small}>
+                                タグは、コンマで区切って入力するのだッ
+                            </small>
+                        </div>
+                        <button type="submit" className={styles.submitBtn}>
+                            オラ！
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <Footer />
+        </div>
+    );
+}
+```
+
+(2) 値が入力されるたびに、setTitle などの中身を更新していく
+
+```tsx
+<input
+    type="text"
+    id="title"
+    className={styles.textInput}
+    onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+/>
+```
+
+-   インプットタグに onChange イベントを設定
+-   (e)のトリガーを設定し、setTitle の e.target.value を変更するように設定
+-   TypeScript なので、型タイプを指定 (e: Changeevent<HTMLInputElement>)
+
+(3) 投稿ボタンを押したときに、API を叩いていけるようにする
+
+-   まず、form タグに onSubmit で handleSubmit を渡す
+
+```tsx
+    <form className={styles.form} onSubmit={handleSubmit}>
+```
+
+-   次に、handleSubmit を定義する
+
+```tsx
+import Head from "next/head";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import styles from "../styles/Post.module.css";
+import { ChangeEvent, FormEvent, useState } from "react"; //<= ここに追加するのを忘れずに！
+
+export default function Create() {
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [body, setBody] = useState("");
+    const [tags, setTags] = useState("");
+
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault(); // 統合するときに勝手にリロードされるのを防ぐ
+
+        console.log(title, description, body, tags); //<= この時点で、画面上で入力した文字列を取得できているかチェック
+    };
+
+    return (
+        <div>
+            <Head>
+                <title>新規投稿</title>
+                // 以下略
+```
+
+(4) API を叩く際に、axios ライブラリ を使っていく
+
+```bash
+npm install axios
+```
+
+※tag_list 周りでエラーが発生したため、以降 tag_list 関連はコメントアウトした状態になっています
+
+```tsx
+// 省略
+import axios from "axios";
+
+export default function Create() {
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [body, setBody] = useState("");
+    // const [tags, setTags] = useState("");
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault(); // 統合するときに勝手にリロードされるのを防ぐ
+
+        // console.log(title, description, body, tags); //<= この時点で、画面上で入力した文字列を取得できているかチェック
+
+        // APIを叩く
+        try {
+            // axiosのpostメソッドを使ってAPIを呼び出していく
+            await axios.post("http://localhost:3000/api/articles", {
+                // どの情報と一緒に使っていくかを設定
+             // typesで設定した型：このページで使用する名前
+                title: title,
+                description: description,
+                body: body,
+             // tag_list: tags,
+            });
+        } catch (error) {
+            alert("このDIOが、投稿に失敗しただとーッ!?");
+        }
+    };
+```
+
+-   これで、実際に入力したデータが一覧に掲載されるかを確かめる
+
+(5) 投稿ボタンが押した後、一覧ページに遷移させる
+
+-   useRouter を使う
+
+```tsx
+// 省略
+import { useRouter } from "next/router";// <=ここに追記
+
+export default function Create() {
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [body, setBody] = useState("");
+    // const [tags, setTags] = useState("");
+
+    const router = useRouter(); // <=ここに追記
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+
+        // console.log(title, description, body, tags); //<= この時点で、画面上で入力した文字列を取得できているかチェック
+
+        // APIを叩く
+        try {
+            await axios.post("http://localhost:3000/api/articles", {
+                title: title,
+                description: description,
+                body: body,
+                // tag_list: tags,
+            });
+
+            // awaitが終わったらページ遷移
+            router.push("/");
+        } catch (error) {
+            alert("このDIOが、投稿に失敗しただとーッ!?");
+        }
+    };
+
+    return (
+        <div>
+            <Head>
+                <title>新規投稿</title>
+                // 以下略
+
+```
+
+### 10. 編集ページを作成する
+
+(1) ディレクトリとファイルの作成
+
+-   pages ディレクトリ内に edit_article というディレクトリを作成
+-   edit_article ディレクトリ内に[id].tsx ファイルを作成
+-   動的ルーティングにすることで、id によりページを動的に変えることができる
+-   create_post.tsx と中身が似ているので、コピーしてから修正していく
+
+(2) 修正箇所の確認
+
+```tsx
+import Head from "next/head";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
+import styles from "../styles/Post.module.css";
+import { ChangeEvent, FormEvent, useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/router";
+
+// 関数名をEditに変更
+export default function Edit() {
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [body, setBody] = useState("");
+    // const [tags, setTags] = useState("");
+
+    const router = useRouter();
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        // APIを叩く
+        try {
+            // putメソッドに修正　※この後ろのエンドポイントは(3)で解説
+            await axios.put("http://localhost:3000/api/articles", {
+                title: title,
+                description: description,
+                body: body,
+                // tag_list: tags,
+            });
+            router.push("/");
+        } catch (error) {
+            alert("このDIOが、編集に失敗しただとーッ!?");
+        }
+    };
+
+    return (
+        <div>
+            <Head>
+                // タイトルを変更
+                <title>投稿編集</title>
+                <meta
+                    name="description"
+                    content="Create a new post on Conduit."
+                />
+            </Head>
+            <Header />
+            <div className={styles.createPage}>
+                <div className={styles.container}>
+                    <h1 className={styles.title}>投稿編集</h1>
+                    <form className={styles.form} onSubmit={handleSubmit}>
+                        <div className={styles.formGroup}>
+                            <label htmlFor="title" className={styles.postLabel}>
+                                タイトル
+                            </label>
+                            <input
+                                type="text"
+                                id="title"
+                                className={styles.textInput}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                    setTitle(e.target.value)
+                                }
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label
+                                htmlFor="description"
+                                className={styles.postLabel}
+                            >
+                                概要
+                            </label>
+                            <input
+                                type="text"
+                                id="description"
+                                className={styles.textInput}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                    setDescription(e.target.value)
+                                }
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label htmlFor="body" className={styles.postLabel}>
+                                本文
+                            </label>
+                            <textarea
+                                id="body"
+                                rows={8}
+                                className={styles.textArea}
+                                onChange={(
+                                    e: ChangeEvent<HTMLTextAreaElement>
+                                ) => setBody(e.target.value)}
+                            ></textarea>
+                        </div>
+                        {/* <div className={styles.formGroup}>
+                            <label htmlFor="tags" className={styles.postLabel}>
+                                タグ設定
+                            </label>
+                            <input
+                                type="text"
+                                id="tags"
+                                className={styles.textInput}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                    setTags(e.target.value)
+                                }
+                            />
+                            <small className={styles.small}>
+                                タグは、コンマで区切って入力するのだッ
+                            </small>
+                        </div> */}
+                        <button type="submit" className={styles.submitBtn}>
+                            オラオラ！
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <Footer />
+        </div>
+    );
+}
+```
+
+(3) 編集しようとするページの API の取得
+① Rails の show アクションと同じようにすれば、固有のページ情報を取得できる
+
+```tsx
+export async function getServerSideProps(context: any) {
+    const id = context.params.id;
+}
+```
+
+このように書くことで、/1 だったら、id=1 の情報を取得できるようになる
+
+② 次に
+
+```tsx
+export async function getServerSideProps(context: any) {
+    const id = context.params.id;
+    // idを使ってAPIを叩いていく
+    const res = await fetch(`https://localhost:3000/api/articles/${id}`);
+    const article = await res.json();
+}
+```
+
+このようにすることで、エンドポイントに id を使って表示できるようになる
+
+③ さらに、これをプロップスで渡す必要があるので
+
+```tsx
+export async function getServerSideProps(context: any) {
+    const id = context.params.id;
+    // idを使ってAPIを叩いていく
+    const res = await fetch(`https://localhost:3000/api/articles/${id}`);
+    const article = await res.json();
+
+    return {
+        props: {
+            article,
+        },
+    };
+}
+```
+
+props の article という変数で渡すように設定
+
+④ これを、Edit の引数として受け取る必要がるので
+
+```tsx
+export async function getServerSideProps(context: any) {
+    const id = context.params.id;
+    // idを使ってAPIを叩いていく
+    const res = await fetch(`https://localhost:3000/api/articles/${id}`);
+    const article = await res.json();
+
+    return {
+        props: {
+            article,
+        },
+    };
+}
+
+export default function Edit({ article }) {
+    // 以下略
+```
+
+⑤ TypeScript なので、型定義をする必要があるためあ
+
+```tsx
+import { ArticleTypes } from "@/types/types"; //<= 型定義したtypesファイルから読み込む
+
+type Props = {
+    article: ArticleTypes; //<= articleは、ArticleTypesを参照している
+};
+
+export async function getServerSideProps(context: any) {
+    const id = context.params.id;
+    // idを使ってAPIを叩いていく
+    const res = await fetch(`https://localhost:3000/api/articles/${id}`);
+    const article = await res.json();
+
+    return {
+        props: {
+            article,
+        },
+    };
+}
+                                        // それをPropsという形で渡す
+export default function Edit({ article }: Props) {
+    // 以下略
+```
+
+⑥ この{article}の中には、編集しようとしているブログのデータが入っている
+そのため、useState に渡す初期値を変更
+
+```tsx
+import { ArticleTypes } from "@/types/types";
+
+type Props = {
+    article: ArticleTypes;
+};
+
+export async function getServerSideProps(context: any) {
+    const id = context.params.id;
+    const res = await fetch(`https://localhost:3000/api/articles/${id}`);
+    const article = await res.json();
+
+    return {
+        props: {
+            article,
+        },
+    };
+}
+
+export default function Edit({ article }: Props) {
+                                        // このように初期値として、既存のデータをもたせる
+    const [title, setTitle]             = useState(article.title);
+    const [description, setDescription] = useState(article.description);
+    const [body, setBody]               = useState(article.body);
+    // const [tags, setTags] = useState("");
+
+    const router = useRouter();
+// 以下略
+```
+
+⑦ また、<input>にも value をもたせる
+
+```tsx
+import Head from "next/head";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
+import styles from "../styles/Post.module.css";
+import { ChangeEvent, FormEvent, useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/router";
+import { ArticleTypes } from "@/types/types";
+
+type Props = {
+    article: ArticleTypes;
+};
+
+export async function getServerSideProps(context: any) {
+    const id = context.params.id;
+    const res = await fetch(`https://localhost:3000/api/articles/${id}`);
+    const article = await res.json();
+
+    return {
+        props: {
+            article,
+        },
+    };
+}
+
+export default function Edit({ article }: Props) {
+    const [title, setTitle] = useState(article.title);
+    const [description, setDescription] = useState(article.description);
+    const [body, setBody] = useState(article.body);
+
+    const router = useRouter();
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+
+        try {
+            await axios.put("http://localhost:3000/api/articles", {
+                title: title,
+                description: description,
+                body: body,
+            });
+            router.push("/");
+        } catch (error) {
+            alert("このDIOが、編集に失敗しただとーッ!?");
+        }
+    };
+
+    return (
+        <div>
+            <Head>
+                <title>投稿編集</title>
+                <meta
+                    name="description"
+                    content="Create a new post on Conduit."
+                />
+            </Head>
+            <Header />
+            <div className={styles.createPage}>
+                <div className={styles.container}>
+                    <h1 className={styles.title}>投稿編集</h1>
+                    <form className={styles.form} onSubmit={handleSubmit}>
+                        <div className={styles.formGroup}>
+                            <label htmlFor="title" className={styles.postLabel}>
+                                タイトル
+                            </label>
+                            <input
+                                type="text"
+                                id="title"
+                                className={styles.textInput}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                    setTitle(e.target.value)
+                                }
+                                value={title} //<=ここに追記
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label
+                                htmlFor="description"
+                                className={styles.postLabel}
+                            >
+                                概要
+                            </label>
+                            <input
+                                type="text"
+                                id="description"
+                                className={styles.textInput}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                    setDescription(e.target.value)
+                                }
+                                value={description} //<=ここに追記
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label htmlFor="body" className={styles.postLabel}>
+                                本文
+                            </label>
+                            <textarea
+                                id="body"
+                                rows={8}
+                                className={styles.textArea}
+                                onChange={(
+                                    e: ChangeEvent<HTMLTextAreaElement>
+                                ) => setBody(e.target.value)}
+                                value={body} //<=ここに追記
+                            ></textarea>
+                        </div>
+                        <button type="submit" className={styles.submitBtn}>
+                            オラオラ！
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <Footer />
+        </div>
+    );
+}
+```
+
+⑨ put メソッドの後ろのエンドポイントを修正
+
+```tsx
+import { ArticleTypes } from "@/types/types";
+
+type Props = {
+    article: ArticleTypes;
+};
+
+export async function getServerSideProps(context: any) {
+    const id = context.params.id;
+    const res = await fetch(`https://localhost:3000/api/articles/${id}`);
+    const article = await res.json();
+
+    return {
+        props: {
+            article,
+        },
+    };
+}
+
+export default function Edit({ article }: Props) {
+    const [title, setTitle] = useState(article.title);
+    const [description, setDescription] = useState(article.description);
+    const [body, setBody] = useState(article.body);
+
+    const router = useRouter();
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+
+        try {
+            await axios.put(`http://localhost:3000/api/articles/${article.id}`, {
+                title: title,
+                // 以下略
+```
+
+⑩ 細かいタイポがあったので修正
+
+```tsx
+import Head from "next/head";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
+import styles from "../../styles/Post.module.css";
+import { ChangeEvent, FormEvent, useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/router";
+import { ArticleTypes } from "@/types/types";
+
+type Props = {
+    article: ArticleTypes;
+};
+
+export async function getServerSideProps(context: any) {
+    const id = context.params.id;
+    // idを使ってAPIを叩いていく
+    const res = await fetch(`http://localhost:3000/api/articles/${id}`);
+    const article = await res.json();
+
+    return {
+        props: {
+            article,
+        },
+    };
+}
+
+export default function Edit({ article }: Props) {
+    const [title, setTitle] = useState(article.title);
+    const [description, setDescription] = useState(article.description);
+    const [body, setBody] = useState(article.body);
+    // const [tags, setTags] = useState("");
+
+    const router = useRouter();
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault(); // 統合するときに勝手にリロードされるのを防ぐ
+
+        // console.log(title, description, body, tags); //<= この時点で、画面上で入力した文字列を取得できているかチェック
+
+        // APIを叩く
+        try {
+            await axios.put(
+                `http://localhost:3000/api/articles/${article.id}`,
+                {
+                    title: title,
+                    description: description,
+                    body: body,
+                    // tag_list: tags,
+                }
+            );
+            // awaitが終わったらページ遷移
+            router.push("/");
+        } catch (error) {
+            alert("このDIOが、編集に失敗しただとーッ!?");
+        }
+    };
+
+    return (
+        <div>
+            <Head>
+                <title>投稿編集</title>
+                <meta
+                    name="description"
+                    content="Create a new post on Conduit."
+                />
+            </Head>
+            <Header />
+            <div className={styles.createPage}>
+                <div className={styles.container}>
+                    <h1 className={styles.title}>投稿編集</h1>
+                    <form className={styles.form} onSubmit={handleSubmit}>
+                        <div className={styles.formGroup}>
+                            <label htmlFor="title" className={styles.postLabel}>
+                                タイトル
+                            </label>
+                            <input
+                                type="text"
+                                id="title"
+                                className={styles.textInput}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                    setTitle(e.target.value)
+                                }
+                                value={title}
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label
+                                htmlFor="description"
+                                className={styles.postLabel}
+                            >
+                                概要
+                            </label>
+                            <input
+                                type="text"
+                                id="description"
+                                className={styles.textInput}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                    setDescription(e.target.value)
+                                }
+                                value={description}
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label htmlFor="body" className={styles.postLabel}>
+                                本文
+                            </label>
+                            <textarea
+                                id="body"
+                                rows={8}
+                                className={styles.textArea}
+                                onChange={(
+                                    e: ChangeEvent<HTMLTextAreaElement>
+                                ) => setBody(e.target.value)}
+                                value={body}
+                            ></textarea>
+                        </div>
+                        {/* <div className={styles.formGroup}>
+                            <label htmlFor="tags" className={styles.postLabel}>
+                                タグ設定
+                            </label>
+                            <input
+                                type="text"
+                                id="tags"
+                                className={styles.textInput}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                    setTags(e.target.value)
+                                }
+                            />
+                            <small className={styles.small}>
+                                タグは、コンマで区切って入力するのだッ
+                            </small>
+                        </div> */}
+                        <button type="submit" className={styles.submitBtn}>
+                            オラオラ！
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <Footer />
+        </div>
+    );
+}
+```
+
+### 11. 一覧ページの Edit を押したら、10 で作ったページに遷移するように設定する
+
+ボタンタグをリンクタグで囲んで、href 属性にテンプレートリテラルの形で書く
+
+```tsx:index.tsx
+// 省略
+<Link href={`/edit_article/${article.id}`}>
+    <button className={styles.btnOutlineEdit}>Edit</button>
+</Link>
+```
+
+### 12. 一覧ページの Delete を押したら、記事を削除するように設定する
+
+(1) 削除ボタンに onClick を設定し、引数に article.id を持たせる
+
+```tsx:index.tsx
+<button
+    className={styles.btnOutlineDelete}
+    onClick={() => handleDelete(article.id)}
+>
+    Delete
+</button>
+```
+
+(2) 次に、handleDelete を定義する
+
+```tsx:index.tsx
+export default function Home({ articles, popularTags }: Props) {
+    const handleDelete = (articleId: string) => {};
+    return (
+        <>
+            <Head>
+                <title>Conduit Home</title>
+    // 以下略
+```
+
+(3) handleDelete の引数に articleId というのを設定。型は string
+
+```tsx:index.tsx
+import axios from "axios";// 忘れずに
+
+export default function Home({ articles, popularTags }: Props) {
+                        // asyncを追記
+    const handleDelete = async (articleId: string) => {
+        try {
+            await axios.delete(`http:localhost:3000/api/article/${articleId}`);
+        } catch (err) {
+            alert("なにぃ!? 削除できないだと…ッ!!");
+        }
+    };
+    // 以下略
+```
+
+(4) useRouter を使って、削除後にページをリロードするように設定
+
+```tsx
+import { useRouter } from "next/router"; // 忘れずに！
+
+export default function Home({ articles, popularTags }: Props) {
+    // ここで定義
+    const router = useRouter();
+
+    const handleDelete = async (articleId: string) => {
+        try {
+            await axios.delete(
+                `http://localhost:3000/api/articles/${articleId}`
+            );
+            // ここで使用
+            router.reload();
+        } catch (err) {
+            alert("なにぃ!? 削除できないだと…ッ!!");
+        }
+    };
+```
+
+(5) 削除前に確認アラートを設定
+
+```tsx
+export default function Home({ articles, popularTags }: Props) {
+    const router = useRouter();
+
+    const handleDelete = async (articleId: string) => {
+        try {
+            if (confirm("貴様…ッ! 本当に消すつもりかアァァッ!!")) {
+                await axios.delete(
+                    `http://localhost:3000/api/articles/${articleId}`
+                );
+
+                // 削除に成功したらリロード
+                router.reload();
+            }
+        } catch (err) {
+            alert("なにぃ!? 削除できないだと…ッ!!");
+        }
+    };
+```

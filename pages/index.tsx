@@ -7,6 +7,8 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { ArticleTypes } from "@/types/types";
 import Pagination from "../components/Pagination/Pagination"; // Paginationをインポート
+import axios from "axios";
+import { useRouter } from "next/router";
 
 type Props = {
     articles: ArticleTypes[];
@@ -34,6 +36,22 @@ export async function getStaticProps() {
 }
 
 export default function Home({ articles, popularTags }: Props) {
+    const router = useRouter();
+
+    const handleDelete = async (articleId: string) => {
+        try {
+            if (confirm("貴様…ッ! 本当に消すつもりかアァァッ!!")) {
+                await axios.delete(
+                    `http://localhost:3000/api/articles/${articleId}`
+                );
+
+                // 削除に成功したらリロード
+                router.reload();
+            }
+        } catch (err) {
+            alert("なにぃ!? 削除できないだと…ッ!!");
+        }
+    };
     return (
         <>
             <Head>
@@ -117,7 +135,7 @@ export default function Home({ articles, popularTags }: Props) {
                                                 className={styles.articleCard}
                                             >
                                                 <Link
-                                                    href={`article/${article.id}`}
+                                                    href={`articles/${article.id}`}
                                                     className={
                                                         styles.previewLink
                                                     }
@@ -132,7 +150,7 @@ export default function Home({ articles, popularTags }: Props) {
                                                         <span>
                                                             Read more...
                                                         </span>
-                                                        <ul
+                                                        {/* <ul
                                                             className={
                                                                 styles.tagList
                                                             }
@@ -158,17 +176,26 @@ export default function Home({ articles, popularTags }: Props) {
                                                                     );
                                                                 }
                                                             )}
-                                                        </ul>
-                                                        <button
-                                                            className={
-                                                                styles.btnOutlineEdit
-                                                            }
+                                                        </ul> */}
+                                                        <Link
+                                                            href={`/edit_article/${article.id}`}
                                                         >
-                                                            Edit
-                                                        </button>
+                                                            <button
+                                                                className={
+                                                                    styles.btnOutlineEdit
+                                                                }
+                                                            >
+                                                                Edit
+                                                            </button>
+                                                        </Link>
                                                         <button
                                                             className={
                                                                 styles.btnOutlineDelete
+                                                            }
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    article.id
+                                                                )
                                                             }
                                                         >
                                                             Delete
@@ -183,7 +210,7 @@ export default function Home({ articles, popularTags }: Props) {
                                     })}
                                 </div>
 
-                                <div className={styles.colMd3}>
+                                {/* <div className={styles.colMd3}>
                                     <div className={styles.sidebar}>
                                         <p>Popular Tags</p>
 
@@ -199,7 +226,7 @@ export default function Home({ articles, popularTags }: Props) {
                                             ))}
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
 
                             <div className={styles.horizontalLine}></div>

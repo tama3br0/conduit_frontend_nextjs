@@ -19,7 +19,7 @@ const Header: React.FC = () => {
                             </li>
                             <li className="header-nav-item">
                                 <Link
-                                    href="/create_post"
+                                    href="/create_article"
                                     className="header-nav-link"
                                 >
                                     <i className="ion-compose" />

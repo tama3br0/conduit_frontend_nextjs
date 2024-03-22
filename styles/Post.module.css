@@ -1,50 +1,61 @@
-/* Post.module.css */
 .createPage {
-    padding: 20px 0; /* Add padding to top and bottom */
+    background-color: #eee;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1em;
+}
+
+.title {
+    font-size: 2em;
+    color: #333;
+    margin-bottom: 0.5em;
 }
 
 .form {
-    width: 70%; /* Form width */
-    max-width: 600px; /* Max width for better readability */
-    margin: 0 auto; /* Center align the form */
+    width: 70%;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .formGroup {
-    margin-bottom: 20px; /* Space between form groups */
+    margin-bottom: 20px;
 }
 
 .postLabel {
-    display: block; /* Each label on a new line */
-    margin-bottom: 5px; /* Space below labels */
+    display: block;
+    margin-bottom: 5px;
 }
 
 .textInput,
 .textArea {
-    width: 100%; /* Text input and textarea full width */
-    padding: 8px; /* Padding for input fields */
-    font-size: 16px; /* Font size */
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
 }
 
 .textArea {
-    resize: vertical; /* Allow vertical resizing of textarea */
+    resize: vertical;
 }
 
 .small {
-    display: block; /* Separate small tag on a new line */
-    margin-top: 5px; /* Space above small tag */
-    color: #888; /* Dim color for small tag */
+    display: block;
+    margin-top: 5px;
+    color: #888;
 }
 
 .submitBtn {
-    background-color: #5cb85c; /* Button background color */
-    color: #fff; /* Button text color */
-    border: none; /* Remove button border */
-    padding: 10px 20px; /* Button padding */
-    font-size: 16px; /* Button font size */
-    cursor: pointer; /* Change cursor on hover */
-    border-radius: 5px; /* Button border radius */
+    background-color: #5cb85c;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
 }
 
 .submitBtn:hover {
-    background-color: #4cae4c; /* Button background color on hover */
+    background-color: #4cae4c;
 }

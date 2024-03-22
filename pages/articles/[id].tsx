@@ -9,6 +9,7 @@ import styles from "../../styles/Show.module.css";
 import Link from "next/link";
 import CommentForm from "../../components/Article/CommentForm";
 import CommentList from "../../components/Article/CommentList";
+import axios from "axios";
 
 type Props = {
     article: ArticleTypes;
@@ -56,6 +57,21 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
 }
 
 const Article = ({ article, comments }: Props) => {
+    const handleDelete = async (articleId: string) => {
+        try {
+            if (confirm("貴様…ッ! 本当に消すつもりかアァァッ!!")) {
+                await axios.delete(
+                    `http://localhost:3000/api/articles/${articleId}`
+                );
+
+                // 削除に成功したらリロード
+                router.push("/");
+            }
+        } catch (err) {
+            alert("なにぃ!? 削除できないだと…ッ!!");
+        }
+    };
+
     const router = useRouter();
 
     if (router.isFallback) {
@@ -85,24 +101,43 @@ const Article = ({ article, comments }: Props) => {
                                 </span>
                             </div>
                             <div className={styles.buttonContainer}>
-                                <button className={styles.btnOutlineSecondary}>
-                                    <i className={styles.ionRound} />
-                                    Follow Eric Simons
-                                    <span className={styles.counter}>(10)</span>
-                                </button>
-                                <button className={styles.btnOutlinePrimary}>
-                                    <i className={styles.ionHeart} />
-                                    Favorite Post{" "}
-                                    <span className={styles.counter}>(29)</span>
-                                </button>
-                                <button className={styles.btnOutlineEdit}>
-                                    <i className={styles.ionEdit} /> Edit
-                                    Article
-                                </button>
-                                <button className={styles.btnOutlineDelete}>
-                                    <i className={styles.ionTrash} /> Delete
-                                    Article
-                                </button>
+                                <div>
+                                    <button
+                                        className={styles.btnOutlineSecondary}
+                                    >
+                                        <i className={styles.ionRound} />
+                                        Follow Eric Simons
+                                        <span className={styles.counter}>
+                                            (10)
+                                        </span>
+                                    </button>
+                                </div>
+                                <div>
+                                    <button
+                                        className={styles.btnOutlinePrimary}
+                                    >
+                                        <i className={styles.ionHeart} />
+                                        Favorite Post{" "}
+                                        <span className={styles.counter}>
+                                            (29)
+                                        </span>
+                                    </button>
+                                </div>
+                                <Link href={`/edit_article/${article.id}`}>
+                                    <button className={styles.btnOutlineEdit}>
+                                        <i className={styles.ionEdit} /> Edit
+                                        Article
+                                    </button>
+                                </Link>
+                                <div>
+                                    <button
+                                        className={styles.btnOutlineDelete}
+                                        onClick={() => handleDelete(article.id)}
+                                    >
+                                        <i className={styles.ionTrash} /> Delete
+                                        Article
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -140,23 +175,43 @@ const Article = ({ article, comments }: Props) => {
                                 </span>
                             </div>
                             <div className={styles.buttonContainer}>
-                                <button className={styles.btnOutlineSecondary}>
-                                    <i className={styles.ionRound} />
-                                    Follow Eric Simons
-                                </button>
-                                <button className={styles.btnOutlinePrimary}>
-                                    <i className={styles.ionHeart} />
-                                    Favorite Article{" "}
-                                    <span className="counter">(29)</span>
-                                </button>
-                                <button className={styles.btnOutlineEdit}>
-                                    <i className={styles.ionEdit} /> Edit
-                                    Article
-                                </button>
-                                <button className={styles.btnOutlineDelete}>
-                                    <i className={styles.ionTrash} /> Delete
-                                    Article
-                                </button>
+                                <div>
+                                    <button
+                                        className={styles.btnOutlineSecondary}
+                                    >
+                                        <i className={styles.ionRound} />
+                                        Follow Eric Simons
+                                        <span className={styles.counter}>
+                                            (10)
+                                        </span>
+                                    </button>
+                                </div>
+                                <div>
+                                    <button
+                                        className={styles.btnOutlinePrimary}
+                                    >
+                                        <i className={styles.ionHeart} />
+                                        Favorite Post{" "}
+                                        <span className={styles.counter}>
+                                            (29)
+                                        </span>
+                                    </button>
+                                </div>
+                                <Link href={`/edit_article/${article.id}`}>
+                                    <button className={styles.btnOutlineEdit}>
+                                        <i className={styles.ionEdit} /> Edit
+                                        Article
+                                    </button>
+                                </Link>
+                                <div>
+                                    <button
+                                        className={styles.btnOutlineDelete}
+                                        onClick={() => handleDelete(article.id)}
+                                    >
+                                        <i className={styles.ionTrash} /> Delete
+                                        Article
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
